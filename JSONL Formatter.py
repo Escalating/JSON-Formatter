@@ -1,5 +1,20 @@
+#Copyright 2018 Dillon Jennings
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses/>.
+
 import tkinter as tk
-import re, xlsxwriter
+import re, xlsxwriter, os
 from tkinter import *
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
@@ -37,11 +52,12 @@ def openFile():
                 top.destroy()
                 count = 0
                 for match in matches:
-                    fileText = match
+                    text1 = re.sub(r"\"\, \"\, \"\, \"", ', ', match)
+                    text2 = re.sub(r"\"\, \" \"\, \"", ' ', text1)
+                    text3 = re.sub(r"\"\, \"", ' ', text2)
+                    fileText = text3
                     display.insert(END, fileText + '\n')
-                    #print(fileText)
-
-
+                    
                 def saveFile():
                     try:
                         file_options = options = {}
@@ -90,7 +106,7 @@ def selectFileToFormat():
     try:
         ftypes = [('Normal text file',"*.txt")]
         ttl = "Title"
-        dir1 = 'T:\\'
+        dir1 = 'C:\\'
         window.fileName = askopenfilename(filetypes = ftypes, initialdir = dir1, title = ttl)
         print(window.fileName)
         selectedFile = window.fileName
@@ -98,16 +114,7 @@ def selectFileToFormat():
         with open(selectedFile, "r") as f:
             fileText = f.read()
             lines = fileText.splitlines()
-            #print(lines)
-            evli = []
-            odli = []
-            for index, line in enumerate(lines):
-                if index % 2 == 0:
-                    evli.append(line)
-                else:
-                    odli.append(line)
-            #print(evli)
-            #print(odli)
+            print(len(lines))
             top.maxsize(720, 720)
             top.title(selectedFile)
             scrollbar = Scrollbar(top, orient=VERTICAL)
@@ -122,6 +129,7 @@ def selectFileToFormat():
 
             def formatFile():
                 top2 = Toplevel(top)
+                top2.resizable(0, 0)
                 varcols = IntVar()
                 l1 = Label(top2, text="How many columns? (Max of 5)")
                 l1.pack()
@@ -164,6 +172,7 @@ def selectFileToFormat():
                         maxcols = [1,2,3,4,5]
                         top2.destroy()
                         top3 = Toplevel(top)
+                        top3.resizable(0, 0)
                         varcolnames = StringVar()
                         l2 = Label(top3, text="Enter the names of the columns.")
                         l2.pack()
@@ -178,44 +187,61 @@ def selectFileToFormat():
                             name_list.append(ent)
 
                         def makeSheet():
+                            nl = []
                             for name in name_list:
                                 print(name.get())
                                 name = name.get()
-                            top3.destroy()
-                            workbook = xlsxwriter.Workbook('%s.xlsx' % (selectedFile))
-                            worksheet = workbook.add_worksheet()
-                            if numcols == 1:
-                                worksheet.write('A1', name)
-                            elif numcols == 2:
-                                worksheet.write('A1', name)
-                                worksheet.write('B1', name)
-                            elif numcols == 3:
-                                worksheet.write('A1', name)
-                                worksheet.write('B1', name)
-                                worksheet.write('C1', name)
-                            elif numcols == 4:
-                                worksheet.write('A1', name)
-                                worksheet.write('B1', name)
-                                worksheet.write('C1', name)
-                                worksheet.write('D1', name)
-                            elif numcols == 5:
-                                worksheet.write('A1', name)
-                                worksheet.write('B1', name)
-                                worksheet.write('C1', name)
-                                worksheet.write('D1', name)
-                                worksheet.write('E1', name)
+                                nl.append(name)
                                 
-                            rowS = 1
-                            colS = 0
+                            top3.destroy()
+                            print(nl)
+                            file = os.path.splitext(os.path.basename(selectedFile))[0]
+                            workbook = xlsxwriter.Workbook('%s.xlsx' % (file))
+                            worksheet = workbook.add_worksheet()
+                            bold = workbook.add_format({'bold': True})
+                            worksheet.write_row('A1', nl, bold)
 
-                            for el in evli:
-                                worksheet.write(rowS, colS, el)
-                                rowS += 1
+                            num_cols = len(nl)
                             rowS = 1
                             colS = 0
-                            for ol in odli:
-                                worksheet.write(rowS, colS + 1, ol)
-                                rowS += 1
+                            
+                            nx = 0
+                            data1 = []
+                            data2 = []
+                            data3 = []
+                            data4 = []
+                            data5 = []
+                            data = []
+                            for index, item in enumerate(lines):
+                                if nx == 0:
+                                    data1.append(item)
+                                    nx += 1
+                                    worksheet.write_column('A2', data1)
+                                    if num_cols == 1:
+                                        nx = 0
+                                elif nx == 1:
+                                    data2.append(item)
+                                    nx += 1
+                                    worksheet.write_column('B2', data2)
+                                    if num_cols == 2:
+                                        nx = 0
+                                elif nx == 2:
+                                    data3.append(item)
+                                    nx += 1
+                                    worksheet.write_column('C2', data3)
+                                    if num_cols == 3:
+                                        nx = 0
+                                elif nx == 3:
+                                    data4.append(item)
+                                    nx += 1
+                                    worksheet.write_column('D2', data4)
+                                    if num_cols == 4:
+                                        nx = 0
+                                elif nx == 4:
+                                    data5.append(item)
+                                    nx = 0
+                                    worksheet.write_column('E2', data5)
+                                                                       
                             workbook.close()
                             finished = showinfo("Complete", "Your file has been sucessfully formatted and save as an Excel Spreadsheet.")
                             top.destroy()
