@@ -24,9 +24,9 @@ window = Tk()
 
 def openFile():
     try:
-        ftypes = [('JL file',"*.jl")]
+        ftypes = [('JL file',"*.jl"), ('JSON file', "*.json")]
         ttl = "Title"
-        dir1 = 'T:\\'
+        dir1 = 'C:\\'
         window.fileName = askopenfilename(filetypes = ftypes, initialdir = dir1, title = ttl)
         print(window.fileName)
         selectedFile = window.fileName
