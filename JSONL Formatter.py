@@ -25,7 +25,7 @@ window = Tk()
 def openFile():
     try:
         ftypes = [('JL file',"*.jl"), ('JSON file', "*.json")]
-        ttl = "Title"
+        ttl = "Open"
         dir1 = 'C:\\'
         window.fileName = askopenfilename(filetypes = ftypes, initialdir = dir1, title = ttl)
         print(window.fileName)
@@ -105,7 +105,7 @@ def openFile():
 def selectFileToFormat():
     try:
         ftypes = [('Normal text file',"*.txt")]
-        ttl = "Title"
+        ttl = "Open"
         dir1 = 'C:\\'
         window.fileName = askopenfilename(filetypes = ftypes, initialdir = dir1, title = ttl)
         print(window.fileName)
