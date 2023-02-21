@@ -1,4 +1,4 @@
-#Copyright 2018 Dillon Jennings
+#Copyright 2018 Evelyn Jennings
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
